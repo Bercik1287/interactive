@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin - Gry</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="site-page home-page">
+    <header class="global-header">
+      <button class="icon-btn" type="button" title="Menu">☰</button>
+      <input
+        id="admin-game-search"
+        class="global-search"
+        type="search"
+        placeholder="Wyszukaj gre..."
+        list="admin-game-options"
+      />
+      <datalist id="admin-game-options"></datalist>
+      <a class="header-logo" href="/admin">INTERACTIVE MAPS ADMIN</a>
+    </header>
+
+    <main class="home-main">
+      <section class="hero-card">
+        <h1>Admin - Gry</h1>
+        <p>Wybierz gre, aby zarzadzac mapami. Dodaj nowe gry jednym przyciskiem.</p>
+        <div class="admin-action-row">
+          <button id="admin-add-game-btn" type="button">+ Dodaj gre</button>
+          <a class="link-button hero-admin-link" href="/">Widok uzytkownika</a>
+        </div>
+      </section>
+
+      <section>
+        <h2>Gry</h2>
+        <div id="admin-game-grid" class="game-grid"></div>
+      </section>
+    </main>
+
+    <script src="/admin_home.js"></script>
+  </body>
+</html>

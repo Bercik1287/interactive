@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aplikacja Map Interaktywnych</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <aside class="sidebar">
+      <header class="sidebar__header">
+        <h1 id="map-title">Interactive Map</h1>
+        <p>Prototyp aplikacji do map interaktywnych</p>
+      </header>
+
+      <section class="controls">
+        <div class="controls__row">
+          <a class="link-button" href="/admin">Przejdz do panelu admina</a>
+          <span></span>
+        </div>
+        <label class="search">
+          <span>Region</span>
+          <select id="map-select"></select>
+        </label>
+        <div class="controls__row">
+          <button id="show-all-btn" type="button">Show All</button>
+          <button id="hide-all-btn" type="button">Hide All</button>
+        </div>
+        <label class="search">
+          <span>Szukaj punktu</span>
+          <input
+            id="search-input"
+            type="search"
+            placeholder="np. Camp, Passcode, Memory Stick..."
+          />
+        </label>
+        <div class="tools">
+          <button id="distance-tool-btn" type="button">Distance Tool: OFF</button>
+          <button id="sniper-tool-btn" type="button">Sniping Radius: OFF</button>
+        </div>
+      </section>
+
+      <section class="filters" id="filters-container"></section>
+    </aside>
+
+    <main class="map-shell">
+      <div id="map"></div>
+      <div class="legend" id="legend">
+        <strong>Tip:</strong> kliknij marker, aby zobaczyć szczegóły.
+      </div>
+    </main>
+
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
+    <script src="/app.js"></script>
+  </body>
+</html>

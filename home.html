@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aplikacja Map Interaktywnych - Strona glowna</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="site-page home-page">
+    <header class="global-header">
+      <button id="home-menu-btn" class="icon-btn" type="button" title="Menu">☰</button>
+      <input
+        id="global-game-search"
+        class="global-search"
+        type="search"
+        placeholder="Wyszukaj gre..."
+        list="home-game-options"
+      />
+      <datalist id="home-game-options"></datalist>
+      <a class="header-logo" href="/">INTERACTIVE MAPS</a>
+    </header>
+
+    <main class="home-main">
+      <section class="hero-card">
+        <h1>Interaktywne mapy gier</h1>
+        <p>
+          Wybierz gre z listy i przejdz do mapy. W panelu admina mozesz zarzadzac mapami, kategoriami
+          i znacznikami.
+        </p>
+        <a class="link-button hero-admin-link" href="/admin">Panel administracyjny</a>
+      </section>
+
+      <section>
+        <h2>Dostepne gry</h2>
+        <div id="game-grid" class="game-grid"></div>
+      </section>
+    </main>
+
+    <script src="/home.js"></script>
+  </body>
+</html>

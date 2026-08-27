@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aplikacja Map Interaktywnych - Mapa</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="site-page map-page">
+    <header class="global-header">
+      <button id="menu-toggle" class="icon-btn" type="button" title="Menu">☰</button>
+      <input
+        id="global-game-search"
+        class="global-search"
+        type="search"
+        placeholder="Wyszukaj gre..."
+        list="map-game-options"
+      />
+      <datalist id="map-game-options"></datalist>
+      <a class="header-logo" href="/">INTERACTIVE MAPS</a>
+    </header>
+
+    <main class="map-main">
+      <aside id="marker-drawer" class="marker-drawer">
+        <header class="drawer-header">
+          <h2 id="map-title">Mapa</h2>
+          <p id="game-title">Wybierz region i filtry</p>
+        </header>
+
+        <section class="controls">
+          <label class="search">
+            <span>Region</span>
+            <select id="map-select"></select>
+          </label>
+          <div class="controls__row">
+            <button id="show-all-btn" type="button">Show All</button>
+            <button id="hide-all-btn" type="button">Hide All</button>
+          </div>
+          <label class="search">
+            <span>Szukaj punktu</span>
+            <input
+              id="search-input"
+              type="search"
+              placeholder="np. Camp, Passcode, Memory Stick..."
+            />
+          </label>
+          <div class="tools">
+            <button id="distance-tool-btn" type="button">Distance Tool: OFF</button>
+            <button id="sniper-tool-btn" type="button">Sniping Radius: OFF</button>
+          </div>
+        </section>
+
+        <section class="filters" id="filters-container"></section>
+      </aside>
+
+      <div id="drawer-backdrop" class="drawer-backdrop"></div>
+
+      <section class="map-shell">
+        <div id="map"></div>
+        <div class="legend" id="legend"></div>
+      </section>
+    </main>
+
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
+    <script src="/app.js"></script>
+  </body>
+</html>

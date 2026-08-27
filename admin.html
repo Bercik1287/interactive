@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aplikacja Map Interaktywnych - Panel Administracyjny</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="admin-page">
+    <aside class="sidebar">
+      <header class="sidebar__header">
+        <h1>Panel Administracyjny</h1>
+        <p>Zarzadzanie grami, mapami, kategoriami i znacznikami</p>
+        <a class="link-button" href="/admin">Powrot do listy gier</a>
+      </header>
+
+      <section class="controls">
+        <label class="search">
+          <span>Aktywna mapa</span>
+          <select id="admin-map-select"></select>
+        </label>
+        <label class="search">
+          <span>Skala znacznika (%)</span>
+          <input id="admin-marker-size-percent" type="number" min="10" max="400" step="1" value="100" />
+        </label>
+        <button id="admin-save-marker-size-btn" type="button">Zapisz skale znacznika</button>
+        <button id="admin-delete-map-btn" type="button" class="admin-danger-btn">Usun aktualna mape</button>
+      </section>
+
+      <section class="filters admin-forms">
+        <label class="search">
+          <span>Grafika bazowa aktualnej mapy</span>
+          <input id="admin-map-image-file" type="file" accept="image/*" />
+        </label>
+        <button id="admin-set-map-image-btn" type="button">Ustaw grafike mapy</button>
+
+        <hr />
+
+        <button id="admin-add-group-btn" type="button">Dodaj kategorie</button>
+        <div id="admin-channel-tree"></div>
+
+        <label class="search">
+          <span>Wybierz znacznik do edycji</span>
+          <select id="admin-marker-select"></select>
+        </label>
+        <label class="search">
+          <span>Grafika znacznika</span>
+          <input id="admin-marker-image-file" type="file" accept="image/*" />
+        </label>
+        <button id="admin-set-marker-image-btn" type="button">Ustaw grafike znacznika</button>
+        <button id="admin-place-marker-btn" type="button">
+          Ustaw znacznik na mapie (kliknij na mapie)
+        </button>
+        <div id="admin-status" class="admin-status"></div>
+      </section>
+    </aside>
+
+    <main class="map-shell">
+      <div id="map"></div>
+      <div id="admin-trash" class="map-trash" title="Przeciagnij znacznik tutaj, aby usunac">
+        🗑 Usun znacznik
+      </div>
+      <div class="legend" id="legend">Kliknij na mapie, aby ustawic pozycje znacznika.</div>
+    </main>
+    <div id="admin-category-modal" class="admin-modal hidden" aria-hidden="true">
+      <div class="admin-modal__backdrop" data-close-category-modal></div>
+      <section class="admin-modal__panel admin-editor" role="dialog" aria-modal="true" aria-label="Edycja typu znacznika">
+        <button id="admin-category-modal-close" type="button" class="admin-modal__close" title="Zamknij">×</button>
+        <h3>Edycja typu znacznika</h3>
+        <label class="search">
+          <span>Nazwa typu</span>
+          <input id="admin-category-name-input" type="text" placeholder="Np. Zamkniete skrzynie" />
+        </label>
+        <label class="search">
+          <span>Fallbackowy kolor</span>
+          <input id="admin-category-color-input" type="color" value="#9ca3af" />
+        </label>
+        <label class="search">
+          <span>Grafika dla wszystkich znacznikow tego typu na tej mapie</span>
+          <input id="admin-category-icon-file" type="file" accept="image/*" />
+        </label>
+        <div class="admin-action-row admin-editor-actions">
+          <button id="admin-category-save-btn" type="button">Zapisz typ</button>
+          <button id="admin-category-delete-btn" type="button" class="admin-danger-btn">Usun typ</button>
+        </div>
+        <div id="admin-category-marker-list" class="admin-marker-editor-list"></div>
+      </section>
+    </div>
+
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
+    <script src="/admin.js"></script>
+  </body>
+</html>
