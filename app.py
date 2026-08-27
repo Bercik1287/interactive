@@ -1,13 +1,18 @@
 from pathlib import Path
+import sys
 
 from flask import Flask, jsonify, request, send_from_directory
 from werkzeug.utils import secure_filename
 
-from data_store import load_data, new_id, save_data, slugify
+from data_store import DATA_DIR, load_data, new_id, save_data, slugify
 from map_data import CATEGORY_GROUPS
 
-BASE_DIR = Path(__file__).resolve().parent
-UPLOADS_DIR = BASE_DIR / "uploads"
+if getattr(sys, "frozen", False):
+    STATIC_DIR = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parent))
+else:
+    STATIC_DIR = Path(__file__).resolve().parent
+
+UPLOADS_DIR = DATA_DIR / "uploads"
 app = Flask(__name__)
 DEFAULT_MARKER_SCALE_PERCENT = 100
 
@@ -22,27 +27,27 @@ def normalize_marker_scale_percent(value) -> int:
 
 @app.get("/")
 def index():
-    return send_from_directory(BASE_DIR, "home.html")
+    return send_from_directory(STATIC_DIR, "home.html")
 
 
 @app.get("/map")
 def map_page():
-    return send_from_directory(BASE_DIR, "map.html")
+    return send_from_directory(STATIC_DIR, "map.html")
 
 
 @app.get("/admin")
 def admin_page():
-    return send_from_directory(BASE_DIR, "admin_home.html")
+    return send_from_directory(STATIC_DIR, "admin_home.html")
 
 
 @app.get("/admin/game")
 def admin_game_page():
-    return send_from_directory(BASE_DIR, "admin_game.html")
+    return send_from_directory(STATIC_DIR, "admin_game.html")
 
 
 @app.get("/admin/map")
 def admin_map_page():
-    return send_from_directory(BASE_DIR, "admin.html")
+    return send_from_directory(STATIC_DIR, "admin.html")
 
 
 @app.get("/api/map-data")
@@ -373,7 +378,7 @@ def uploaded_files(filename: str):
 
 @app.get("/<path:filename>")
 def static_files(filename: str):
-    return send_from_directory(BASE_DIR, filename)
+    return send_from_directory(STATIC_DIR, filename)
 
 
 if __name__ == "__main__":

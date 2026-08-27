@@ -1,12 +1,31 @@
 import json
+import os
 import re
+import sys
 from pathlib import Path
 from typing import Any
 from uuid import uuid4
 
 from map_data import CATEGORY_COLORS, CATEGORY_GROUPS, MAPS
 
-DATA_FILE = Path(__file__).resolve().parent / "data.json"
+PROJECT_DIR = Path(__file__).resolve().parent
+
+
+def resolve_data_directory() -> Path:
+    override = os.environ.get("INTERACTIVE_MAPS_DATA_DIR", "").strip()
+    if override:
+        path = Path(override).expanduser()
+        path.mkdir(parents=True, exist_ok=True)
+        return path
+    if getattr(sys, "frozen", False):
+        path = Path.home() / ".interactive-maps"
+        path.mkdir(parents=True, exist_ok=True)
+        return path
+    return PROJECT_DIR
+
+
+DATA_DIR = resolve_data_directory()
+DATA_FILE = DATA_DIR / "data.json"
 DEFAULT_MARKER_SCALE_PERCENT = 100
 
 

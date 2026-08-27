@@ -1,7 +1,7 @@
 # Aplikacja Map Interaktywnych (Python MVP)
 
 Prototyp aplikacji do tworzenia i przegladania interaktywnych map gier.
-Frontend dziala w przegladarce, a aplikacja jest uruchamiana na backendzie Python (Flask).
+Frontend dziala jako aplikacja webowa oraz desktopowa offline, a backend opiera sie o Python (Flask).
 
 ## Funkcje
 
@@ -9,11 +9,9 @@ Frontend dziala w przegladarce, a aplikacja jest uruchamiana na backendzie Pytho
 - wiele map i regionow w ramach wielu gier
 - markery z popupami
 - pelny podzial na kategorie i grupy znacznikow
-- filtrowanie punktow (checkboxy)
+- filtrowanie punktow (przyciski typow)
 - Show All / Hide All
 - wyszukiwarka punktow i typow
-- Distance Tool (pomiar odleglosci)
-- Sniping Radius Tool (koncentryczne promienie)
 - tryb administracyjny:
   - dodaj gre
   - dodaj mape
@@ -54,6 +52,54 @@ Potem otworz:
 - panel administracyjny (mapy gry): `http://127.0.0.1:4173/admin/game?game=<gameId>`
 - panel administracyjny (edycja mapy): `http://127.0.0.1:4173/admin/map?map=<mapId>`
 
+## Tryb desktop (offline)
+
+Po instalacji zaleznosci uruchom:
+
+```bash
+.venv/bin/python desktop.py
+```
+
+Aplikacja uruchomi lokalny serwer Flask w tle i otworzy natywne okno desktopowe (bez przegladarki).
+Wszystkie dane (`data.json`, `uploads/`) sa zapisywane lokalnie.
+
+### Build dla Windows (`.exe`)
+
+Uruchom na Windows (PowerShell):
+
+```powershell
+.\build-windows.ps1
+```
+
+Wynik:
+
+- `dist\interactive-maps.exe`
+
+### Build dla Linux (`.AppImage`)
+
+Uruchom na Linux:
+
+```bash
+./build-linux-appimage.sh
+```
+
+Wymagane narzedzie:
+
+- `appimagetool` w `PATH` (skrypt wypisze instrukcje, jesli go brak)
+
+Wynik:
+
+- `dist/interactive-maps-<arch>.AppImage`
+
+### Ważne ograniczenie
+
+Buildy musza byc wykonywane na docelowym systemie:
+
+- `.exe` buduj na Windows
+- `.AppImage` buduj na Linux
+
+Cross-build z jednego systemu na drugi nie jest tutaj wspierany.
+
 ## Struktura danych
 
 - `map_data.py` - dane seed (startowy zestaw map/kategorii/markerow)
@@ -72,3 +118,4 @@ Potem otworz:
 - Markery sa automatycznie wygenerowane na podstawie liczebnosci kategorii dla kazdej mapy.
 - Domyslny seed danych to przykladowy zestaw, ktory mozna dowolnie edytowac w panelu admina.
 - Uploadowane grafiki sa zapisywane w katalogu `uploads/`.
+- W wersjach spakowanych (`exe`/`AppImage`) dane sa zapisywane w katalogu `~/.interactive-maps`.
