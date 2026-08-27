@@ -3,8 +3,11 @@ import threading
 import time
 import urllib.error
 import urllib.request
+import os
 
-import webview
+from PySide6.QtCore import QUrl
+from PySide6.QtWidgets import QApplication
+from PySide6.QtWebEngineWidgets import QWebEngineView
 from werkzeug.serving import make_server
 
 from app import app
@@ -43,6 +46,10 @@ def wait_until_ready(base_url: str, timeout_seconds: float = 8.0) -> None:
 
 
 def main() -> None:
+    # Chromium sandbox fails when launched as root in some environments.
+    if hasattr(os, "geteuid") and os.geteuid() == 0:
+        os.environ.setdefault("QTWEBENGINE_DISABLE_SANDBOX", "1")
+
     host = "127.0.0.1"
     port = find_free_port()
     base_url = f"http://{host}:{port}"
@@ -51,15 +58,15 @@ def main() -> None:
     server.start()
     wait_until_ready(base_url)
 
-    webview.create_window(
-        "Interactive Maps",
-        base_url,
-        width=1440,
-        height=900,
-        min_size=(1024, 700),
-    )
     try:
-        webview.start()
+        qt_app = QApplication([])
+        view = QWebEngineView()
+        view.setWindowTitle("Interactive Maps")
+        view.resize(1440, 900)
+        view.setMinimumSize(1024, 700)
+        view.load(QUrl(base_url))
+        view.show()
+        qt_app.exec()
     finally:
         server.shutdown()
 

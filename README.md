@@ -60,7 +60,7 @@ Po instalacji zaleznosci uruchom:
 .venv/bin/python desktop.py
 ```
 
-Aplikacja uruchomi lokalny serwer Flask w tle i otworzy natywne okno desktopowe (bez przegladarki).
+Aplikacja uruchomi lokalny serwer Flask w tle i otworzy natywne okno desktopowe (Qt WebEngine, bez przegladarki).
 Wszystkie dane (`data.json`, `uploads/`) sa zapisywane lokalnie.
 
 ### Build dla Windows (`.exe`)

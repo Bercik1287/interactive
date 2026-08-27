@@ -1,10 +1,15 @@
 # -*- mode: python ; coding: utf-8 -*-
 
+from PyInstaller.utils.hooks import collect_data_files, collect_dynamic_libs, collect_submodules
+
+pyside_datas = collect_data_files("PySide6")
+pyside_binaries = collect_dynamic_libs("PySide6")
+pyside_hiddenimports = collect_submodules("PySide6")
 
 a = Analysis(
     ["desktop.py"],
     pathex=[],
-    binaries=[],
+    binaries=pyside_binaries,
     datas=[
         ("home.html", "."),
         ("map.html", "."),
@@ -18,13 +23,9 @@ a = Analysis(
         ("admin.js", "."),
         ("admin_home.js", "."),
         ("admin_game.js", "."),
-    ],
-    hiddenimports=[
-        "webview.platforms.gtk",
-        "webview.platforms.qt",
-        "webview.platforms.edgechromium",
-        "webview.platforms.mshtml",
-    ],
+    ]
+    + pyside_datas,
+    hiddenimports=pyside_hiddenimports,
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],

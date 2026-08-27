@@ -1,2 +1,2 @@
 Flask
-pywebview
+PySide6
