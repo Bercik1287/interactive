@@ -31,6 +31,9 @@ async function initAdminHomePage() {
   const searchInput = document.getElementById("admin-game-search");
   const datalist = document.getElementById("admin-game-options");
   const addButton = document.getElementById("admin-add-game-btn");
+  const exportBtn = document.getElementById("admin-export-btn");
+  const importBtn = document.getElementById("admin-import-btn");
+  const importFileInput = document.getElementById("admin-import-file");
 
   let games = [];
   let maps = [];
@@ -102,6 +105,41 @@ async function initAdminHomePage() {
       window.location.href = `/admin/game?game=${created.id}`;
     } catch (error) {
       window.alert(`Nie udalo sie dodac gry: ${error.message}`);
+    }
+  });
+
+  exportBtn.addEventListener("click", () => {
+    window.location.href = "/api/admin/export";
+  });
+
+  importBtn.addEventListener("click", () => {
+    importFileInput.value = "";
+    importFileInput.click();
+  });
+
+  importFileInput.addEventListener("change", async () => {
+    const file = importFileInput.files[0];
+    if (!file) return;
+    const confirmed = window.confirm(
+      "Import zastapi aktualne dane aplikacji (gry, mapy, kategorie, znaczniki i grafiki). Kontynuowac?"
+    );
+    if (!confirmed) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+    try {
+      const response = await fetch("/api/admin/import", {
+        method: "POST",
+        body: formData
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(payload.error || `HTTP ${response.status}`);
+      await reload();
+      window.alert(
+        `Import zakonczony.\nGry: ${payload.games}\nMapy: ${payload.maps}\nKategorie: ${payload.categories}\nZnaczniki: ${payload.markers}\nPliki: ${payload.uploads}`
+      );
+    } catch (error) {
+      window.alert(`Nie udalo sie zaimportowac pakietu: ${error.message}`);
     }
   });
 

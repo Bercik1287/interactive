@@ -15,6 +15,7 @@ Frontend dziala jako aplikacja webowa oraz desktopowa offline, a backend opiera 
 - tryb administracyjny:
   - dodaj gre
   - dodaj mape
+  - import / eksport kompletnego pakietu map (`.zip`)
   - ustaw grafike bazowa mapy
   - dodaj nowa kategorie
   - dodaj nowy znacznik
@@ -119,3 +120,4 @@ Cross-build z jednego systemu na drugi nie jest tutaj wspierany.
 - Domyslny seed danych to przykladowy zestaw, ktory mozna dowolnie edytowac w panelu admina.
 - Uploadowane grafiki sa zapisywane w katalogu `uploads/`.
 - W wersjach spakowanych (`exe`/`AppImage`) dane sa zapisywane w katalogu `~/.interactive-maps`.
+- Eksport/import w panelu admina zapisuje i przywraca caly zestaw danych (`data.json`) oraz pliki z `uploads/`.

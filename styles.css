@@ -105,6 +105,10 @@ body.map-page {
   max-width: 460px;
 }
 
+.admin-transfer-row {
+  margin-top: 8px;
+}
+
 .game-grid {
   margin-top: 10px;
   display: grid;

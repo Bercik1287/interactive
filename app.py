@@ -1,7 +1,11 @@
 from pathlib import Path
+import io
+import json
+import shutil
 import sys
+from zipfile import BadZipFile, ZIP_DEFLATED, ZipFile
 
-from flask import Flask, jsonify, request, send_from_directory
+from flask import Flask, jsonify, request, send_file, send_from_directory
 from werkzeug.utils import secure_filename
 
 from data_store import DATA_DIR, load_data, new_id, save_data, slugify
@@ -23,6 +27,33 @@ def normalize_marker_scale_percent(value) -> int:
     except (TypeError, ValueError):
         percent = DEFAULT_MARKER_SCALE_PERCENT
     return max(10, min(400, percent))
+
+
+def validate_import_data(payload):
+    required_keys = ("games", "maps", "categories", "markers", "categoryGroupsByGame")
+    missing = [key for key in required_keys if key not in payload]
+    if missing:
+        raise ValueError(f"Missing required keys: {', '.join(missing)}")
+
+    if not isinstance(payload["games"], list):
+        raise ValueError("games must be a list")
+    if not isinstance(payload["maps"], list):
+        raise ValueError("maps must be a list")
+    if not isinstance(payload["categories"], list):
+        raise ValueError("categories must be a list")
+    if not isinstance(payload["markers"], list):
+        raise ValueError("markers must be a list")
+    if not isinstance(payload["categoryGroupsByGame"], dict):
+        raise ValueError("categoryGroupsByGame must be an object")
+
+    for map_entry in payload["maps"]:
+        if not isinstance(map_entry, dict):
+            raise ValueError("Invalid map item in maps list")
+        map_entry["markerScalePercent"] = normalize_marker_scale_percent(
+            map_entry.get("markerScalePercent", DEFAULT_MARKER_SCALE_PERCENT)
+        )
+
+    return payload
 
 
 @app.get("/")
@@ -352,6 +383,81 @@ def delete_game(game_id: str):
 
     save_data(data)
     return jsonify({"deleted": game_id})
+
+
+@app.get("/api/admin/export")
+def export_package():
+    data = load_data()
+    package_name = "interactive-maps-export.zip"
+    memory_file = io.BytesIO()
+    uploads_root = UPLOADS_DIR
+
+    with ZipFile(memory_file, mode="w", compression=ZIP_DEFLATED) as archive:
+        archive.writestr("data.json", json.dumps(data, ensure_ascii=True, indent=2))
+        if uploads_root.exists():
+            for file_path in uploads_root.rglob("*"):
+                if not file_path.is_file():
+                    continue
+                rel_path = file_path.relative_to(uploads_root).as_posix()
+                archive.write(file_path, arcname=f"uploads/{rel_path}")
+
+    memory_file.seek(0)
+    return send_file(
+        memory_file,
+        as_attachment=True,
+        download_name=package_name,
+        mimetype="application/zip",
+    )
+
+
+@app.post("/api/admin/import")
+def import_package():
+    uploaded = request.files.get("file")
+    if not uploaded:
+        return jsonify({"error": "Missing file"}), 400
+
+    try:
+        raw = uploaded.read()
+        with ZipFile(io.BytesIO(raw), mode="r") as archive:
+            if "data.json" not in archive.namelist():
+                return jsonify({"error": "Archive must contain data.json"}), 400
+
+            data_payload = json.loads(archive.read("data.json").decode("utf-8"))
+            validated = validate_import_data(data_payload)
+            save_data(validated)
+
+            if UPLOADS_DIR.exists():
+                shutil.rmtree(UPLOADS_DIR)
+            UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
+
+            restored_files = 0
+            for name in archive.namelist():
+                if not name.startswith("uploads/"):
+                    continue
+                rel = Path(name.removeprefix("uploads/"))
+                if not rel.parts or rel.name == "":
+                    continue
+                if rel.is_absolute() or ".." in rel.parts:
+                    continue
+                destination = (UPLOADS_DIR / rel).resolve()
+                if UPLOADS_DIR.resolve() not in destination.parents and destination != UPLOADS_DIR.resolve():
+                    continue
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                destination.write_bytes(archive.read(name))
+                restored_files += 1
+    except (BadZipFile, OSError, UnicodeDecodeError, ValueError, json.JSONDecodeError):
+        return jsonify({"error": "Invalid import package"}), 400
+
+    return jsonify(
+        {
+            "ok": True,
+            "games": len(validated["games"]),
+            "maps": len(validated["maps"]),
+            "categories": len(validated["categories"]),
+            "markers": len(validated["markers"]),
+            "uploads": restored_files,
+        }
+    )
 
 
 @app.post("/api/admin/upload-image")
