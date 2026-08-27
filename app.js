@@ -56,8 +56,6 @@ async function initMapApp() {
   const mapTitle = document.getElementById("map-title");
   const gameTitle = document.getElementById("game-title");
   const mapSelect = document.getElementById("map-select");
-  const distanceBtn = document.getElementById("distance-tool-btn");
-  const sniperBtn = document.getElementById("sniper-tool-btn");
   const drawer = document.getElementById("marker-drawer");
   const drawerBackdrop = document.getElementById("drawer-backdrop");
   const menuToggle = document.getElementById("menu-toggle");
@@ -71,16 +69,6 @@ async function initMapApp() {
   let layerByType = new Map();
   let markerById = new Map();
   let enabledTypes = new Set();
-  let distanceToolEnabled = false;
-  let distancePoints = [];
-  let distanceMarkers = [];
-  let distanceLine = null;
-  let distanceLabels = [];
-  let sniperEnabled = false;
-  let sniperGroup = null;
-  let sniperCenter = null;
-  let sniperDragging = false;
-  const sniperRadii = [50, 100, 150, 200];
 
   const getMapMarkers = (mapId) => state.markers.filter((marker) => marker.mapId === mapId);
   const categoryById = (categoryId) => state.categories.find((category) => category.id === categoryId);
@@ -152,16 +140,6 @@ async function initMapApp() {
     for (const layer of layerByType.values()) map.removeLayer(layer);
     layerByType = new Map();
     markerById = new Map();
-  }
-
-  function clearDistanceOverlays() {
-    for (const marker of distanceMarkers) map.removeLayer(marker);
-    for (const label of distanceLabels) map.removeLayer(label);
-    distanceMarkers = [];
-    distanceLabels = [];
-    if (distanceLine) map.removeLayer(distanceLine);
-    distanceLine = null;
-    distancePoints = [];
   }
 
   function updateLegend(extraText = "") {
@@ -269,36 +247,6 @@ async function initMapApp() {
     });
   }
 
-  function drawSniperLayers(center) {
-    sniperGroup.clearLayers();
-    for (const radius of sniperRadii) {
-      L.circle(center, {
-        radius,
-        color: radius === 200 ? "#ff6b6b" : "#ffd166",
-        weight: 1.2,
-        fill: false,
-        dashArray: "4 8"
-      }).addTo(sniperGroup);
-    }
-    L.circleMarker(center, { radius: 6, color: "#fff", fillColor: "#ff6b6b", fillOpacity: 1 }).addTo(
-      sniperGroup
-    );
-  }
-
-  function resetTools() {
-    clearDistanceOverlays();
-    distanceToolEnabled = false;
-    distanceBtn.classList.remove("active");
-    distanceBtn.textContent = "Distance Tool: OFF";
-    if (sniperGroup) map.removeLayer(sniperGroup);
-    sniperGroup = null;
-    sniperEnabled = false;
-    sniperCenter = null;
-    sniperDragging = false;
-    sniperBtn.classList.remove("active");
-    sniperBtn.textContent = "Sniping Radius: OFF";
-  }
-
   function activateMapById(mapId) {
     const selectedMap = state.maps.find((entry) => entry.id === mapId);
     if (!selectedMap) return;
@@ -314,7 +262,6 @@ async function initMapApp() {
     renderMapSelectForGame(selectedMap.gameId, selectedMap.id);
     enabledTypes = new Set(getMapCategories(selectedMap.id).map((category) => category.name));
     clearPointLayers();
-    resetTools();
     if (overlayLayer) map.removeLayer(overlayLayer);
     overlayLayer = L.imageOverlay(
       selectedMap.baseImageUrl || buildOverlayPlaceholder(selectedMap.name),
@@ -428,62 +375,6 @@ async function initMapApp() {
       if (visible) hits += 1;
     }
     updateLegend(`Wyniki wyszukiwania: ${hits}`);
-  });
-
-  distanceBtn.addEventListener("click", () => {
-    distanceToolEnabled = !distanceToolEnabled;
-    distanceBtn.classList.toggle("active", distanceToolEnabled);
-    distanceBtn.textContent = `Distance Tool: ${distanceToolEnabled ? "ON" : "OFF"}`;
-    if (!distanceToolEnabled) clearDistanceOverlays();
-  });
-  sniperBtn.addEventListener("click", () => {
-    sniperEnabled = !sniperEnabled;
-    sniperBtn.classList.toggle("active", sniperEnabled);
-    sniperBtn.textContent = `Sniping Radius: ${sniperEnabled ? "ON" : "OFF"}`;
-    if (sniperEnabled) {
-      sniperCenter = map.getCenter();
-      sniperGroup = L.layerGroup().addTo(map);
-      drawSniperLayers(sniperCenter);
-      map.on("mousedown", (event) => {
-        if (sniperEnabled && sniperCenter && map.distance(event.latlng, sniperCenter) < 35) {
-          sniperDragging = true;
-        }
-      });
-      map.on("mousemove", (event) => {
-        if (!sniperDragging || !sniperEnabled) return;
-        sniperCenter = event.latlng;
-        drawSniperLayers(sniperCenter);
-      });
-      map.on("mouseup", () => {
-        sniperDragging = false;
-      });
-    } else if (sniperGroup) {
-      map.removeLayer(sniperGroup);
-      sniperGroup = null;
-      sniperCenter = null;
-      sniperDragging = false;
-    }
-  });
-  map.on("click", (event) => {
-    if (!distanceToolEnabled) return;
-    distancePoints.push(event.latlng);
-    const marker = L.circleMarker(event.latlng, {
-      radius: 5,
-      color: "#fff",
-      fillColor: "#47b8ff",
-      fillOpacity: 1
-    }).addTo(map);
-    distanceMarkers.push(marker);
-    if (distancePoints.length === 2) {
-      distanceLine = L.polyline(distancePoints, { color: "#47b8ff", dashArray: "6 6" }).addTo(map);
-      const distance = map.distance(distancePoints[0], distancePoints[1]);
-      const label = L.marker(distancePoints[1], {
-        icon: L.divIcon({ className: "distance-label", html: `${Math.round(distance)} m` })
-      }).addTo(map);
-      distanceLabels.push(label);
-      updateLegend(`Distance: ${Math.round(distance)} m`);
-      distancePoints = [];
-    }
   });
 
   window.addEventListener("resize", () => {
