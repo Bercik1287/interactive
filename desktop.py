@@ -4,9 +4,10 @@ import time
 import urllib.error
 import urllib.request
 import os
+from pathlib import Path
 
-from PySide6.QtCore import QUrl
-from PySide6.QtWidgets import QApplication
+from PySide6.QtCore import QStandardPaths, QUrl
+from PySide6.QtWidgets import QApplication, QFileDialog
 from PySide6.QtWebEngineWidgets import QWebEngineView
 from werkzeug.serving import make_server
 
@@ -58,9 +59,32 @@ def main() -> None:
     server.start()
     wait_until_ready(base_url)
 
+    def handle_download(request) -> None:
+        suggested_name = request.downloadFileName() or "interactive-maps-export.zip"
+        downloads_dir = QStandardPaths.writableLocation(QStandardPaths.StandardLocation.DownloadLocation)
+        if not downloads_dir:
+            downloads_dir = str(Path.home())
+        default_target = str(Path(downloads_dir) / suggested_name)
+
+        selected_path, _ = QFileDialog.getSaveFileName(
+            None,
+            "Zapisz plik eksportu",
+            default_target,
+            "ZIP (*.zip);;Wszystkie pliki (*)",
+        )
+        if not selected_path:
+            request.cancel()
+            return
+
+        target = Path(selected_path)
+        request.setDownloadDirectory(str(target.parent))
+        request.setDownloadFileName(target.name)
+        request.accept()
+
     try:
         qt_app = QApplication([])
         view = QWebEngineView()
+        view.page().profile().downloadRequested.connect(handle_download)
         view.setWindowTitle("Interactive Maps")
         view.resize(1440, 900)
         view.setMinimumSize(1024, 700)
